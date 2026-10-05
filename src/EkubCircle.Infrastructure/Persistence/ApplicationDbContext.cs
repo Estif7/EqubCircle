@@ -13,6 +13,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     }
 
     public DbSet<OtpVerification> OtpVerifications => Set<OtpVerification>();
+    public DbSet<Circle> Circles => Set<Circle>();
+    public DbSet<CircleMembership> CircleMemberships => Set<CircleMembership>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
