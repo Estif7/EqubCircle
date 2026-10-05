@@ -1,0 +1,134 @@
+<div class="container circles-container">
+  
+  <!-- Header & Actions -->
+  <div class="page-header">
+    <div>
+      <h1>Ethiopian Savings Circles (እቁብ)</h1>
+      <p class="subtitle">Join active community circles or start your own savings circle with friends & colleagues.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/circles/create" class="btn btn-primary">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Create New Circle
+      </a>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs & Filters -->
+  <div class="filter-bar">
+    <div class="tab-group" *ngIf="authService.isAuthenticated()">
+      <button
+        (click)="setTab('available')"
+        class="tab-btn"
+        [class.active]="activeTab === 'available'"
+      >
+        Open Circles to Join
+      </button>
+      <button
+        (click)="setTab('my')"
+        class="tab-btn"
+        [class.active]="activeTab === 'my'"
+      >
+        My Circles
+      </button>
+    </div>
+
+    <div class="search-filter-group">
+      <div class="search-box">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          placeholder="Search by circle or organizer name..."
+          class="search-input"
+        />
+      </div>
+
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="selectedFrequency" (change)="applyFilters()" class="filter-select">
+          <option value="ALL">All Frequencies</option>
+          <option value="DAILY">Daily</option>
+          <option value="WEEKLY">Weekly</option>
+          <option value="MONTHLY">Monthly</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading savings circles from backend...</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredCircles.length === 0" class="card empty-card">
+    <div class="empty-icon">⭕</div>
+    <h3>No Savings Circles Found</h3>
+    <p *ngIf="activeTab === 'available'">There are currently no open circles matching your filter criteria.</p>
+    <p *ngIf="activeTab === 'my'">You have not joined or created any circles yet.</p>
+    <a routerLink="/circles/create" class="btn btn-primary mt-3">Start an Ekub Circle Now</a>
+  </div>
+
+  <!-- Circles Grid -->
+  <div *ngIf="!isLoading && filteredCircles.length > 0" class="circles-grid">
+    <div *ngFor="let circle of filteredCircles" class="card circle-card">
+      <div class="card-top">
+        <span class="badge" [ngClass]="{
+          'badge-success': circle.status === 'OPEN',
+          'badge-warning': circle.status === 'ACTIVE',
+          'badge-secondary': circle.status === 'COMPLETED'
+        }">
+          {{ circle.status }}
+        </span>
+        <span class="frequency-tag">{{ circle.frequency }}</span>
+      </div>
+
+      <h3 class="circle-title">{{ circle.name }}</h3>
+
+      <div class="contribution-banner">
+        <span class="banner-label">Contribution</span>
+        <span class="banner-amount">{{ circle.contributionAmount | number:'1.2-2' }} <small>ETB</small></span>
+      </div>
+
+      <!-- Capacity Progress Bar -->
+      <div class="capacity-section">
+        <div class="capacity-label">
+          <span>Members</span>
+          <strong>{{ circle.memberCount }} / {{ circle.memberLimit }}</strong>
+        </div>
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            [style.width.%]="getCapacityPercentage(circle)"
+            [class.fill-complete]="circle.memberCount >= circle.memberLimit"
+          ></div>
+        </div>
+      </div>
+
+      <div class="organizer-info">
+        <span class="org-label">Organizer:</span>
+        <span class="org-name">{{ circle.organizerName }}</span>
+        <span class="badge badge-fayda badge-sm" *ngIf="circle.isOrganizer">Organizer</span>
+        <span class="badge badge-warning badge-sm" *ngIf="circle.isMember && !circle.isOrganizer">Member</span>
+      </div>
+
+      <div class="card-footer">
+        <a [routerLink]="['/circles', circle.id]" class="btn btn-outline btn-block">
+          View Details &amp; Members
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>

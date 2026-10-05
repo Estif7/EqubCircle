@@ -1,0 +1,219 @@
+<div class="container details-container">
+  
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb">
+    <a routerLink="/circles">Savings Circles</a>
+    <span class="sep">/</span>
+    <span class="current">{{ circle?.name || 'Circle Details' }}</span>
+  </nav>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading circle details and membership list...</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Success Alert -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div *ngIf="!isLoading && circle" class="details-layout">
+    
+    <!-- Left Column: Circle Details & Members Table -->
+    <div class="main-column">
+      
+      <!-- Circle Overview Card -->
+      <div class="card overview-card">
+        <div class="card-header-row">
+          <div>
+            <div class="badge-row">
+              <span class="badge" [ngClass]="{
+                'badge-success': circle.status === 'OPEN',
+                'badge-warning': circle.status === 'ACTIVE',
+                'badge-secondary': circle.status === 'COMPLETED'
+              }">
+                {{ circle.status }}
+              </span>
+              <span class="badge badge-warning">{{ circle.frequency }}</span>
+            </div>
+            <h1 class="circle-title">{{ circle.name }}</h1>
+            <p class="meta-date">Created on {{ circle.createdAt | date:'mediumDate' }} by <strong>{{ circle.organizerName }}</strong></p>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <span class="m-label">Contribution Amount</span>
+            <span class="m-value">{{ circle.contributionAmount | number:'1.2-2' }} <small>ETB</small></span>
+            <span class="m-sub">Per member per round</span>
+          </div>
+
+          <div class="metric-box">
+            <span class="m-label">Member Capacity</span>
+            <span class="m-value">{{ circle.memberCount }} / {{ circle.memberLimit }}</span>
+            <span class="m-sub">{{ circle.memberLimit - circle.memberCount }} spots remaining</span>
+          </div>
+
+          <div class="metric-box highlight-pot">
+            <span class="m-label">Target Round Pot</span>
+            <span class="m-value">{{ (circle.contributionAmount * circle.memberLimit) | number:'1.2-2' }} <small>ETB</small></span>
+            <span class="m-sub">Total payout each cycle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members Section -->
+      <div class="card members-card">
+        <div class="members-header">
+          <h2>Registered Members ({{ circle.members.length }})</h2>
+          <span class="badge badge-info" *ngIf="circle.status === 'OPEN'">
+            Payout order assigned deterministically upon start
+          </span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Member</th>
+                <th>Contact</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let member of circle.members" [class.highlight-row]="member.userId === authService.currentUser?.id">
+                <td class="order-cell">
+                  <span class="order-badge" *ngIf="member.payoutOrder">
+                    #{{ member.payoutOrder }}
+                  </span>
+                  <span class="order-pending" *ngIf="!member.payoutOrder">—</span>
+                </td>
+                <td>
+                  <div class="member-user-cell">
+                    <div class="user-avatar-sm">{{ member.fullName.charAt(0) }}</div>
+                    <div>
+                      <strong class="user-name">{{ member.fullName }}</strong>
+                      <span class="you-tag" *ngIf="member.userId === authService.currentUser?.id">(You)</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="contact-cell">
+                  <span>{{ member.email }}</span>
+                  <small>{{ member.phoneNumber }}</small>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="member.roleInCircle === 'ORGANIZER' ? 'badge-fayda' : 'badge-warning'">
+                    {{ member.roleInCircle }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge badge-success">{{ member.status }}</span>
+                </td>
+                <td class="date-cell">
+                  {{ member.joinedAt | date:'shortDate' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Join Action & Organizer Actions -->
+    <div class="sidebar-column">
+      
+      <!-- Join Action Card -->
+      <div class="card action-card">
+        <h3>Join This Savings Circle</h3>
+
+        <!-- Case 1: User is already a member -->
+        <div *ngIf="circle.isMember" class="status-box box-member">
+          <div class="box-icon">✓</div>
+          <div>
+            <strong>You are a member!</strong>
+            <p *ngIf="currentUserMembership?.payoutOrder">
+              Your fixed payout position is <strong>Round #{{ currentUserMembership?.payoutOrder }}</strong>.
+            </p>
+            <p *ngIf="!currentUserMembership?.payoutOrder">
+              Payout positions will be randomized and assigned when the circle starts.
+            </p>
+          </div>
+        </div>
+
+        <!-- Case 2: User is organizer -->
+        <div *ngIf="circle.isOrganizer" class="status-box box-organizer">
+          <div class="box-icon">★</div>
+          <div>
+            <strong>You organize this circle</strong>
+            <p>You have organizer privileges to manage members, record contributions, and execute payouts.</p>
+          </div>
+        </div>
+
+        <!-- Case 3: Can Join -->
+        <div *ngIf="canJoin">
+          <p class="join-info">
+            By joining, you commit to contributing <strong>{{ circle.contributionAmount | number:'1.2-2' }} ETB</strong> every <strong>{{ circle.frequency | lowercase }}</strong> cycle.
+          </p>
+
+          <button
+            type="button"
+            (click)="onJoinCircle()"
+            class="btn btn-primary btn-block btn-lg"
+            [disabled]="isJoining"
+          >
+            <span *ngIf="isJoining">Joining circle...</span>
+            <span *ngIf="!isJoining">Confirm &amp; Join Circle</span>
+          </button>
+        </div>
+
+        <!-- Case 4: Not authenticated -->
+        <div *ngIf="!authService.isAuthenticated()" class="guest-join-box">
+          <p>Please log in with your Fayda-verified account to join this savings circle.</p>
+          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/circles/' + circle.id }" class="btn btn-primary btn-block">
+            Log In to Join
+          </a>
+        </div>
+
+        <!-- Case 5: Circle Full -->
+        <div *ngIf="!circle.isMember && circle.memberCount >= circle.memberLimit" class="status-box box-full">
+          <strong>Circle is Full</strong>
+          <p>This circle has reached its maximum capacity of {{ circle.memberLimit }} members.</p>
+        </div>
+
+        <!-- Case 6: Circle Active / Closed for joining -->
+        <div *ngIf="!circle.isMember && circle.status !== 'OPEN'" class="status-box box-full">
+          <strong>Registration Closed</strong>
+          <p>This circle has already started its active savings cycle and is no longer accepting new members.</p>
+        </div>
+
+        <!-- Organizer Action: Start Circle -->
+        <div *ngIf="circle.isOrganizer && circle.status === 'OPEN'" class="organizer-controls">
+          <hr class="divider" />
+          <h4>Organizer Controls</h4>
+          <p class="control-desc">When all members have joined, start the circle to lock memberships and generate rounds.</p>
+          <button
+            type="button"
+            (click)="onStartCircle()"
+            class="btn btn-secondary btn-block"
+            [disabled]="isStarting || circle.memberCount < 2"
+          >
+            <span *ngIf="isStarting">Starting circle...</span>
+            <span *ngIf="!isStarting">Start Circle &amp; Generate Rounds</span>
+          </button>
+          <small *ngIf="circle.memberCount < 2" class="warning-text">At least 2 members are required to start.</small>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

@@ -17,13 +17,22 @@
       </div>
     </a>
 
+    <!-- Navigation Links -->
+    <nav class="nav-links">
+      <a routerLink="/circles" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        Explore Circles
+      </a>
+      <a *ngIf="currentUser$ | async" routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+        Dashboard
+      </a>
+    </nav>
+
     <!-- Auth State Navigation -->
     <ng-container *ngIf="currentUser$ | async as user; else guestNav">
-      <nav class="nav-links">
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
-      </nav>
-
       <div class="user-menu">
+        <a routerLink="/circles/create" class="btn btn-outline btn-sm">
+          + Start Circle
+        </a>
         <div class="user-badge">
           <div class="user-avatar">{{ user.fullName.charAt(0) }}</div>
           <div class="user-info">

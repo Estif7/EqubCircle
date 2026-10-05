@@ -1,0 +1,137 @@
+.form-container {
+  max-width: 680px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--gray-600);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.breadcrumb .sep {
+  color: var(--gray-300);
+}
+
+.breadcrumb .current {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.form-card {
+  padding: 2.25rem;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.header-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  margin-top: 0.35rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calculation-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-around;
+  margin: 1.75rem 0;
+  text-align: center;
+}
+
+.calc-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.calc-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #166534;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.calc-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-top: 0.25rem;
+}
+
+.organizer-note {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--gold-light);
+  border: 1px solid #fde68a;
+  color: #78350f;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  margin-bottom: 2rem;
+}
+
+.organizer-note svg {
+  flex-shrink: 0;
+  color: var(--secondary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-100);
+}
+
+.btn-submit {
+  padding: 0.75rem 1.5rem;
+}
