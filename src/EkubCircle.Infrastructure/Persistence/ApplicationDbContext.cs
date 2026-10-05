@@ -2,6 +2,7 @@ using EkubCircle.Application.Common.Interfaces;
 using EkubCircle.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EkubCircle.Infrastructure.Persistence;
 
@@ -17,6 +18,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<CircleMembership> CircleMemberships => Set<CircleMembership>();
     public DbSet<Round> Rounds => Set<Round>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Payout> Payouts => Set<Payout>();
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        return Database.BeginTransactionAsync(cancellationToken);
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
