@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +16,7 @@ import { CircleSummary } from '../../../core/models/circle.model';
 export class CircleListComponent implements OnInit {
   private circleService = inject(CircleService);
   public authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   circles: CircleSummary[] = [];
   filteredCircles: CircleSummary[] = [];
@@ -49,10 +50,12 @@ export class CircleListComponent implements OnInit {
         this.circles = data;
         this.applyFilters();
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to load savings circles.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Failed to load savings circles.';
         this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }

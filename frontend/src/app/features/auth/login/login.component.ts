@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -16,6 +16,7 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -37,12 +38,14 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (res) => {
         this.isLoading = false;
+        this.cdr.markForCheck();
         const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
         this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Login failed. Please verify your credentials and try again.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Login failed. Please verify your credentials and try again.';
+        this.cdr.markForCheck();
       }
     });
   }

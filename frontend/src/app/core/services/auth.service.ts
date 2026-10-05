@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, LoginRequest, RegisterRequest, User, VerifyFaydaRequest } from '../models/user.model';
+import { AuthResponse, LoginRequest, RegisterRequest, RegisterResponse, User, VerifyFaydaRequest } from '../models/user.model';
 
 const TOKEN_KEY = 'ekub_token';
 const USER_KEY = 'ekub_user';
@@ -22,8 +22,8 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  public register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, request);
+  public register(request: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, request);
   }
 
   public verifyFayda(request: VerifyFaydaRequest): Observable<AuthResponse> {
@@ -70,16 +70,11 @@ export class AuthService {
   }
 
   private setSession(authResponse: AuthResponse): void {
+    if (!authResponse.token) return;
     localStorage.setItem(TOKEN_KEY, authResponse.token);
-    const user: User = {
-      id: authResponse.userId,
-      email: authResponse.email,
-      fullName: authResponse.fullName,
-      phoneNumber: authResponse.phoneNumber,
-      faydaVerified: authResponse.faydaVerified,
-      createdAt: new Date().toISOString()
-    };
-    this.setUser(user);
+    if (authResponse.user) {
+      this.setUser(authResponse.user);
+    }
   }
 
   private setUser(user: User): void {

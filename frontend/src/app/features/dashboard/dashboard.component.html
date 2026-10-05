@@ -57,16 +57,17 @@
   <div *ngIf="!isLoading && userDashboard" class="circles-section">
     <div class="section-header">
       <h2>Your Active Ekub Circles</h2>
+      <a routerLink="/circles" class="btn btn-secondary">Explore Circles</a>
     </div>
 
     <div *ngIf="userDashboard.activeCircles?.length === 0" class="card empty-state">
-      <p>You have not joined any circles yet.</p>
+      <p>You have not joined any circles yet. <a routerLink="/circles">Browse available circles</a> to start saving!</p>
     </div>
 
     <div class="circles-grid" *ngIf="userDashboard.activeCircles?.length > 0">
       <div *ngFor="let circle of userDashboard.activeCircles" class="card circle-card">
         <div class="circle-card-header">
-          <h3>{{ circle.name }}</h3>
+          <h3><a [routerLink]="['/circles', circle.id]">{{ circle.name }}</a></h3>
           <span class="badge badge-success">{{ circle.status }}</span>
         </div>
         <div class="circle-metrics">

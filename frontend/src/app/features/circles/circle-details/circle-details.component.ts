@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CircleService } from '../../../core/services/circle.service';
@@ -16,6 +16,7 @@ export class CircleDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private circleService = inject(CircleService);
   public authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   circleId = '';
   circle: CircleDetails | null = null;
@@ -50,10 +51,12 @@ export class CircleDetailsComponent implements OnInit {
       next: (data) => {
         this.circle = data;
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to load circle details.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Failed to load circle details.';
         this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -69,11 +72,13 @@ export class CircleDetailsComponent implements OnInit {
       next: (membership) => {
         this.isJoining = false;
         this.successMessage = 'Congratulations! You have successfully joined this savings circle.';
+        this.cdr.markForCheck();
         this.loadCircleDetails();
       },
       error: (err) => {
         this.isJoining = false;
-        this.errorMessage = err.error?.message || 'Could not join circle. Please try again.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Could not join circle. Please try again.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -89,11 +94,13 @@ export class CircleDetailsComponent implements OnInit {
       next: () => {
         this.isStarting = false;
         this.successMessage = 'Circle started! Rounds and payout orders have been generated.';
+        this.cdr.markForCheck();
         this.loadCircleDetails();
       },
       error: (err) => {
         this.isStarting = false;
-        this.errorMessage = err.error?.message || 'Could not start circle.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Could not start circle.';
+        this.cdr.markForCheck();
       }
     });
   }

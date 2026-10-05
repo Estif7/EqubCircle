@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -15,6 +15,7 @@ export class CreateCircleComponent {
   private fb = inject(FormBuilder);
   private circleService = inject(CircleService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   errorMessage = '';
@@ -44,11 +45,13 @@ export class CreateCircleComponent {
     this.circleService.createCircle(this.circleForm.value).subscribe({
       next: (createdCircle) => {
         this.isLoading = false;
+        this.cdr.markForCheck();
         this.router.navigate(['/circles', createdCircle.id]);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Failed to create savings circle. Please verify your inputs.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Failed to create savings circle. Please verify your inputs.';
+        this.cdr.markForCheck();
       }
     });
   }

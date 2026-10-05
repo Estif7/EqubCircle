@@ -7,16 +7,19 @@ export interface User {
   createdAt: string;
 }
 
-export interface AuthResponse {
-  token: string;
+export interface RegisterResponse {
   userId: string;
   email: string;
-  fullName: string;
   phoneNumber: string;
-  faydaVerified: boolean;
-  faydaOtpDevHint?: string | null;
-  requiresFaydaVerification: boolean;
   message: string;
+  devSimulatedOtp?: string | null;
+  faydaOtpDevHint?: string | null;
+}
+
+export interface AuthResponse {
+  token: string;
+  expiresIn: number;
+  user: User;
 }
 
 export interface RegisterRequest {
@@ -29,10 +32,11 @@ export interface RegisterRequest {
 
 export interface VerifyFaydaRequest {
   userId: string;
-  otp: string;
+  otpCode: string;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
 }
+

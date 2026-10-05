@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -15,6 +15,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   // Flow State
   step: 'register' | 'fayda-otp' = 'register';
@@ -58,16 +59,18 @@ export class RegisterComponent {
         this.isLoading = false;
         this.registeredUserId = res.userId;
         this.registeredPhone = res.phoneNumber;
-        this.devOtpHint = res.faydaOtpDevHint || null;
+        this.devOtpHint = res.devSimulatedOtp || res.faydaOtpDevHint || null;
         this.step = 'fayda-otp';
 
         if (this.devOtpHint) {
           this.otpForm.patchValue({ otp: this.devOtpHint });
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Registration failed. Please check your inputs and try again.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Registration failed. Please check your inputs and try again.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -83,15 +86,17 @@ export class RegisterComponent {
 
     this.authService.verifyFayda({
       userId: this.registeredUserId,
-      otp: this.otpForm.value.otp
+      otpCode: this.otpForm.value.otp
     }).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.markForCheck();
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Invalid or expired OTP. Please try again.';
+        this.errorMessage = err.error?.message || err.error?.title || 'Invalid or expired OTP. Please try again.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -105,5 +110,7 @@ export class RegisterComponent {
   backToRegister(): void {
     this.step = 'register';
     this.errorMessage = '';
+    this.cdr.markForCheck();
   }
 }
+
