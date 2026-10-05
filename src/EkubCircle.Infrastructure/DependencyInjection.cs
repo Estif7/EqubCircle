@@ -1,5 +1,6 @@
 using EkubCircle.Application.Common.Interfaces;
 using EkubCircle.Infrastructure.Persistence;
+using EkubCircle.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,10 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
+
+        services.AddScoped<IFaydaVerificationService, SimulatedFaydaVerificationService>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<DatabaseSeeder>();
 
         return services;
     }

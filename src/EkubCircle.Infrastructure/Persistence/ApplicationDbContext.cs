@@ -12,6 +12,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     {
     }
 
+    public DbSet<OtpVerification> OtpVerifications => Set<OtpVerification>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

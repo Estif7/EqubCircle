@@ -1,6 +1,8 @@
 using System.Text;
 using EkubCircle.API.Middlewares;
+using EkubCircle.API.Services;
 using EkubCircle.Application;
+using EkubCircle.Application.Common.Interfaces;
 using EkubCircle.Domain.Entities;
 using EkubCircle.Infrastructure;
 using EkubCircle.Infrastructure.Persistence;
@@ -57,7 +59,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// 4. CORS Configuration
+// 4. Current User & Context Accessor
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// 5. CORS Configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDev", policy =>
@@ -72,7 +78,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// 5. Swagger Configuration with Bearer Token Support
+// 6. Swagger Configuration with Bearer Token Support
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -110,7 +116,14 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// 6. Middleware Pipeline
+// 7. Seed Demo Data
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedAsync();
+}
+
+// 8. Middleware Pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
