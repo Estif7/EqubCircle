@@ -9,6 +9,7 @@ public interface IApplicationDbContext
     DbSet<Circle> Circles { get; }
     DbSet<CircleMembership> CircleMemberships { get; }
     DbSet<Round> Rounds { get; }
+    DbSet<Payment> Payments { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

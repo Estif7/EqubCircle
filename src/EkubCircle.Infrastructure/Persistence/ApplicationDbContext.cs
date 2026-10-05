@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Circle> Circles => Set<Circle>();
     public DbSet<CircleMembership> CircleMemberships => Set<CircleMembership>();
     public DbSet<Round> Rounds => Set<Round>();
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
