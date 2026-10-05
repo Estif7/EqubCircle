@@ -1,0 +1,58 @@
+<!-- Ethiopian Tricolor Accent Stripe -->
+<div class="accent-stripe"></div>
+
+<!-- Top Navigation Bar -->
+<header class="navbar">
+  <div class="container nav-container">
+    <a routerLink="/" class="brand">
+      <div class="brand-symbol">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v10M8 12h8" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">EkubCircle</span>
+        <span class="brand-sub">እቁብ ዲጂታል</span>
+      </div>
+    </a>
+
+    <!-- Auth State Navigation -->
+    <ng-container *ngIf="currentUser$ | async as user; else guestNav">
+      <nav class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
+      </nav>
+
+      <div class="user-menu">
+        <div class="user-badge">
+          <div class="user-avatar">{{ user.fullName.charAt(0) }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ user.fullName }}</span>
+            <span class="badge badge-fayda" *ngIf="user.faydaVerified">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              Fayda Verified
+            </span>
+          </div>
+        </div>
+        <button (click)="onLogout()" class="btn btn-secondary btn-sm">
+          Log Out
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Guest Navigation -->
+    <ng-template #guestNav>
+      <div class="guest-actions">
+        <a routerLink="/login" class="btn btn-outline">Log In</a>
+        <a routerLink="/register" class="btn btn-primary">Join Ekub</a>
+      </div>
+    </ng-template>
+  </div>
+</header>
+
+<!-- Main Page Content -->
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
