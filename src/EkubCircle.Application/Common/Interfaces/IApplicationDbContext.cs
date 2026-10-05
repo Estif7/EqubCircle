@@ -8,6 +8,7 @@ public interface IApplicationDbContext
     DbSet<OtpVerification> OtpVerifications { get; }
     DbSet<Circle> Circles { get; }
     DbSet<CircleMembership> CircleMemberships { get; }
+    DbSet<Round> Rounds { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

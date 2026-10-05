@@ -1,6 +1,7 @@
 using EkubCircle.Application.DTOs.Circles;
 using EkubCircle.Application.Features.Circles.Commands.CreateCircle;
 using EkubCircle.Application.Features.Circles.Commands.JoinCircle;
+using EkubCircle.Application.Features.Circles.Commands.StartCircle;
 using EkubCircle.Application.Features.Circles.Queries.GetAvailableCircles;
 using EkubCircle.Application.Features.Circles.Queries.GetCircleDetails;
 using EkubCircle.Application.Features.Circles.Queries.GetMyCircles;
@@ -69,6 +70,20 @@ public class CirclesController : ControllerBase
     public async Task<IActionResult> Join(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new JoinCircleCommand(id), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/start")]
+    [Authorize]
+    [ProducesResponseType(typeof(CircleDetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Start(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new StartCircleCommand(id), cancellationToken);
         return Ok(result);
     }
 }
