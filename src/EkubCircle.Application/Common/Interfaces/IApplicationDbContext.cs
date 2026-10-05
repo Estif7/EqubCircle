@@ -6,6 +6,7 @@ namespace EkubCircle.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
+    DbSet<ApplicationUser> Users { get; }
     DbSet<OtpVerification> OtpVerifications { get; }
     DbSet<Circle> Circles { get; }
     DbSet<CircleMembership> CircleMemberships { get; }

@@ -1,8 +1,11 @@
 using EkubCircle.Application.DTOs.Circles;
+using EkubCircle.Application.DTOs.Dashboard;
+using EkubCircle.Application.Features.Circles.Commands.AdvanceRound;
 using EkubCircle.Application.Features.Circles.Commands.CreateCircle;
 using EkubCircle.Application.Features.Circles.Commands.JoinCircle;
 using EkubCircle.Application.Features.Circles.Commands.StartCircle;
 using EkubCircle.Application.Features.Circles.Queries.GetAvailableCircles;
+using EkubCircle.Application.Features.Circles.Queries.GetCircleDashboard;
 using EkubCircle.Application.Features.Circles.Queries.GetCircleDetails;
 using EkubCircle.Application.Features.Circles.Queries.GetMyCircles;
 using MediatR;
@@ -84,6 +87,29 @@ public class CirclesController : ControllerBase
     public async Task<IActionResult> Start(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new StartCircleCommand(id), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/advance-round")]
+    [Authorize]
+    [ProducesResponseType(typeof(AdvanceRoundResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> AdvanceRound(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new AdvanceRoundCommand(id), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("{id}/dashboard")]
+    [ProducesResponseType(typeof(CircleDashboardDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetDashboard(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetCircleDashboardQuery(id), cancellationToken);
         return Ok(result);
     }
 }
